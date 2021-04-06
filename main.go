@@ -44,8 +44,9 @@ func main() {
 
 		if success {
 			number -= 1
+		} else {
+			time.Sleep(time.Millisecond * 3000)
 		}
-		time.Sleep(time.Second * 2)
 	}
 	buf := bufio.NewReader(os.Stdin)
 	fmt.Print("> ")
