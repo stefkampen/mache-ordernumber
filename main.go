@@ -1,17 +1,41 @@
 package main
 
 import (
+	"bufio"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
+
+	"github.com/manifoldco/promptui"
 )
 
 func main() {
-	number := 9999
-	vin := "WF0xxxxxx"
+	validate := func(input string) error {
+		_, err := strconv.ParseInt(input, 10, 64)
+		if err != nil {
+			return errors.New("Invalid number")
+		}
+		return nil
+	}
+
+	prompt := promptui.Prompt{
+		Label: "VIN",
+	}
+
+	vin, _ := prompt.Run()
+
+	prompt2 := promptui.Prompt{
+		Label:    "Start at",
+		Validate: validate,
+	}
+
+	numberString, _ := prompt2.Run()
+	number, _ := strconv.ParseInt(numberString, 10, 64)
 
 	for number >= 0 {
 		numberString := fmt.Sprintf("%04d", number)
@@ -21,8 +45,11 @@ func main() {
 		if success {
 			number -= 1
 		}
-		time.Sleep(time.Second * 15)
+		time.Sleep(time.Second * 2)
 	}
+	buf := bufio.NewReader(os.Stdin)
+	fmt.Print("> ")
+	_, _ = buf.ReadBytes('\n')
 }
 
 func retrieveData(name string, number string, url string) bool {
@@ -43,6 +70,9 @@ func retrieveData(name string, number string, url string) bool {
 
 	if resp.Status == "200 OK" {
 		log.Println(number + " found, exiting")
+		buf := bufio.NewReader(os.Stdin)
+		fmt.Print("> ")
+		_, _ = buf.ReadBytes('\n')
 		os.Exit(0)
 	}
 
