@@ -77,7 +77,7 @@ func retrieveData(name string, number string, url string) bool {
 		os.Exit(0)
 	}
 
-	if resp.Status != "404 Not Found" {
+	if resp.Status != "404 Not Found" && resp.Status != "424 Failed Dependency" {
 		log.Println(number + " wrong status, retrying same code " + resp.Status)
 		return false
 	}
